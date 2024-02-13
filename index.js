@@ -8,6 +8,10 @@ const port = 5000;
 
 require("./Database/connectDB");
 
+const expressServer = app.listen(process.env.PORT || port, () => {
+  console.log(`listening on port ${port}`);
+});
+
 
 
 const io = new Server(expressServer, {
@@ -62,6 +66,4 @@ io.on("connection", (socket) => {
 
 
 
-const expressServer = app.listen(process.env.PORT || port, () => {
-  console.log(`listening on port ${port}`);
-});
+
