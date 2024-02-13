@@ -8,9 +8,7 @@ const port = 5000;
 
 require("./Database/connectDB");
 
-const expressServer = app.listen(port, () => {
-  console.log(`listening on port ${port}`);
-});
+
 
 const io = new Server(expressServer, {
   cors: {
@@ -59,4 +57,11 @@ io.on("connection", (socket) => {
       connectUserList.splice(disconnectUser, 1);
     }
   });
+});
+
+
+
+
+const expressServer = app.listen(process.env.PORT || port, () => {
+  console.log(`listening on port ${port}`);
 });
