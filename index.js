@@ -18,7 +18,7 @@ const io = new Server(expressServer, {
   cors: {
     origin: [
       "http://localhost:3000",
-      "https://shop-easee.vercel.app",
+      "https://shopeasee.vercel.app",
       "http://192.168.29.68:3000",
     ],
   },
@@ -38,19 +38,38 @@ io.on("connection", (socket) => {
   let singleUserId;
 
   socket.on("CHANGE__STATUS", ({ productId, userId, oderStatus }) => {
-    // console.log(connectUserList.includes(userId), 'if the user is already connected');
+
+    // finding the user from the connected user array...
 
     singleUserId = connectUserList.find((user) => user.userId === userId);
 
     if (singleUserId) {
-      console.log(singleUserId, "singleUser");
       io.to(singleUserId.socketId).emit("STATUS__CHANGED", { oderStatus });
     } else {
       console.log("user not connected");
     }
-
-    // socket.broadcast.emit('STATUS__CHANGED','hello from the server')
   });
+
+  socket.on('CANCEL__ORDER', async ({ userId, orderId }) => {
+    try {
+      const findOrder = await Order.findOneAndUpdate({ _id: orderId }, { "status": "cancel" }, {  returnOriginal:false }).exec();
+      if(findOrder){
+        const newOrderList = await Order.find({userId});
+
+        singleUserId = connectUserList.find((user)=> user.userId === userId);
+
+        if(singleUserId){          
+          io.to(singleUserId.socketId).emit('UPDATED__ORDERLIST',{orders:newOrderList})
+        }
+         
+      }
+
+      
+
+    } catch (error) {
+      console.log("error", error);
+    }
+  })
 
   socket.on("disconnect", () => {
     const disconnectUser = connectUserList.findIndex(
