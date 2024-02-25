@@ -105,7 +105,8 @@ io.on("connection", (socket) => {
         }
 
         if(adminUser){
-          io.to(adminUser.socketId).emit('ORDERLIST__UPDATE',{orders : newOrderList});
+          const updateOrderList = await Order.find();  // because we need to send the updated order list to the admin user....
+          io.to(adminUser.socketId).emit('ORDERLIST__UPDATE',{orders : updateOrderList});
         }
       }
 
